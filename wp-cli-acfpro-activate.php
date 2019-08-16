@@ -27,62 +27,63 @@
 namespace Soderlind\WPCLI;
 
 ! defined( 'ABSPATH' ) and exit;
-if ( !defined( 'WP_CLI' ) ) return;
+if ( ! defined( 'WP_CLI' ) ) {
+	return;
+}
 
 \WP_CLI::add_command( 'acfpro', __NAMESPACE__ . '\AcfPro_Licence_Activate_CLI' );
 
 class AcfPro_Licence_Activate_CLI extends \WP_CLI_Command {
 
-    /**
-     * Activte the ACF PRO license
-     *
+	/**
+	 * Activte the ACF PRO license
+	 *
 	 * ## OPTIONS
 	 *
 	 * --key=<licensekey>
 	 * : You'll find your ACF PRO license key at https://www.advancedcustomfields.com/my-account/
 	 *
-     * ## EXAMPLES
-     *
-     * wp acfpro activate --key=XXXXXX
-     *
-     */
-    public function activate( $args, $assoc_args ) {
+	 * ## EXAMPLES
+	 *
+	 * wp acfpro activate --key=XXXXXX
+	 */
+	public function activate( $args, $assoc_args ) {
 		if ( isset( $assoc_args['key'] ) && is_plugin_active( 'advanced-custom-fields-pro/acf.php' ) ) {
 
 			// Loads ACF plugin
-			include_once( ABSPATH . 'wp-content/plugins/advanced-custom-fields-pro/acf.php');
+			include_once ABSPATH . 'wp-content/plugins/advanced-custom-fields-pro/acf.php';
 
 			// connect
-			$post = array(
-				'acf_license'   => $assoc_args['key'],
-				'acf_version'   => acf_get_setting('version'),
-				'wp_name'       => get_bloginfo('name'),
-				'wp_url'        => home_url(),
-				'wp_version'    => get_bloginfo('version'),
-				'wp_language'   => get_bloginfo('language'),
-				'wp_timezone'   => get_option('timezone_string'),
-			);
+			$post = [
+				'acf_license' => $assoc_args['key'],
+				'acf_version' => acf_get_setting( 'version' ),
+				'wp_name'     => get_bloginfo( 'name' ),
+				'wp_url'      => home_url(),
+				'wp_version'  => get_bloginfo( 'version' ),
+				'wp_language' => get_bloginfo( 'language' ),
+				'wp_timezone' => get_option( 'timezone_string' ),
+			];
 
 			// connect
-			$response = \acf_updates()->request('v2/plugins/activate?p=pro', $post);
+			$response = \acf_updates()->request( 'v2/plugins/activate?p=pro', $post );
 
 			// ensure response is expected JSON array (not string)
-			if( is_string($response) ) {
-				$response = new \WP_Error( 'server_error', esc_html($response) );
+			if ( is_string( $response ) ) {
+				$response = new \WP_Error( 'server_error', esc_html( $response ) );
 			}
 
 			// error
-			if( is_wp_error($response) ) {
+			if ( is_wp_error( $response ) ) {
 				\WP_CLI::error( $response->get_error_message() );
 			}
 
 			// success
-			if( $response['status'] == 1 ) {
+			if ( $response['status'] == 1 ) {
 				\acf_pro_update_license( $response['license'] ); // update license
-				\WP_CLI::success( "ACF PRO: ". wp_strip_all_tags($response['message']) ); // show message
+				\WP_CLI::success( 'ACF PRO: ' . wp_strip_all_tags( $response['message'] ) ); // show message
 			} else {
-				\WP_CLI::error( "ACF PRO: ". wp_strip_all_tags($response['message']) ); // show message
+				\WP_CLI::error( 'ACF PRO: ' . wp_strip_all_tags( $response['message'] ) ); // show message
 			}
 		}
-    }
+	}
 }
