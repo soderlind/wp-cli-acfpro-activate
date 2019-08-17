@@ -12,10 +12,5 @@
 			"name": "Per Soderlind",
 			"email": "per@soderlind.no"
 		}
-	],
-	"autoload": {
-		"files": [
-			"wp-cli-acfpro-activate.php"
-		]
-	}
+	]
 }
