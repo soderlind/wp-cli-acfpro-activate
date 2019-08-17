@@ -26,7 +26,6 @@
 
 namespace Soderlind\WPCLI;
 
-! defined( 'ABSPATH' ) and exit;
 if ( ! defined( 'WP_CLI' ) ) {
 	return;
 }
